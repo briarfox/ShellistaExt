@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 #ShellistaExt
 
 ##Create a Plugin
@@ -23,7 +23,4 @@ To create a plugin follow this simple example. The name of the .py is the main n
       
       #main code here
     
-=======
-ShellistaExt
-============
->>>>>>> 31949c1a6249cc67e24813307f2d82818bc1c45b
+
