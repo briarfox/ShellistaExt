@@ -158,9 +158,9 @@ def install_xmlrpclib(path='.'):
 # It patches the standard import search paths to include the directory pipista
 # installs downloaded modules in.
 # If you really don't like this functionality, just edit this script to:
-# _auto_path = False
+_auto_path = False
  
-_auto_path = True
+#_auto_path = True
  
 # Begin library prep
  
