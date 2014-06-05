@@ -5,7 +5,7 @@ usage: pypi [download|search|version] module_name
 from tools.tools import bash
 
 
-import os, os.path, sys, urllib2, requests
+import os, os.path, sys, urllib2, requests, xmlrpclib
 
 alias = ['pypi']
 
