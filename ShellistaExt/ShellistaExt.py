@@ -45,34 +45,40 @@ class Shellista(cmd.Cmd):
     self.cmdList = ['quit','exit','logoff','logout',]
     #self._bash = BetterParser()
     #self._bash.env_vars['$HOME']   = os.path.expanduser('~/Documents')
-    for file in os.listdir(os.path.join(os.curdir,'plugins')):
-      (path, extension) = os.path.splitext(file)
-    
-    
-      if extension == '.py' and path != '__init__'and '_plugin' in path:
-        try:
-          lib = importlib.import_module('plugins.'+path)
-          name = 'do_'+path.lower().replace('_plugin','')
-          if self.addCmdList(path.lower()):
-            setattr(Shellista, name, self._CmdGenerator(lib.main))
+    for root,directory,files in os.walk('./plugins'):#os.listdir(os.path.join(os.curdir,'plugins')):
       
+      for file in files:
+        (path, extension) = os.path.splitext(file)
+      
+      
+        if extension == '.py' and path != '__init__' and '_plugin' in path:
+          print file
           try:
-            for a in lib.alias:
-              #pass
-              if self.addCmdList(a):
-                parent = path.lower().replace('_plugin','')
-                setattr(Shellista,'do_' + a.lower(),self._aliasGenerator(getattr(self,name)))
-                setattr(Shellista,'help_'+a.lower(),self._HelpGenerator('Alias for: %s. Please use help on %s for usage.' % (parent,parent)))
-              
-          except (ImportError, AttributeError) as desc:
-            pass
             
+            lib = importlib.import_module(root[2:].replace('/','.')+'.'+path)
+            name = 'do_'+path.lower().replace('_plugin','')
+            if self.addCmdList(path.lower()):
+              setattr(Shellista, name, self._CmdGenerator(lib.main))
+        
+            try:
+              for a in lib.alias:
+                #pass
+                if self.addCmdList(a):
+                  parent = path.lower().replace('_plugin','')
+                  setattr(Shellista,'do_' + a.lower(),self._aliasGenerator(getattr(self,name)))
+                  setattr(Shellista,'help_'+a.lower(),self._HelpGenerator('Alias for: %s. Please use help on %s for usage.' % (parent,parent)))
+                
+            except (ImportError, AttributeError) as desc:
+              pass
               
-              
-          if lib.__doc__:
-            setattr(Shellista, 'help_' + path.lower().replace('_plugin',''), self._HelpGenerator(lib.__doc__))
-        except (ImportError, AttributeError) as desc:
-          print(desc)
+                
+                
+            if lib.__doc__:
+              setattr(Shellista, 'help_' + path.lower().replace('_plugin',''), self._HelpGenerator(lib.__doc__))
+          except (ImportError, AttributeError) as desc:
+            print('Exption error')
+            print(desc)
+ 
  
     cmd.Cmd.__init__(self)
     os.chdir(os.path.expanduser('~/Documents'))
@@ -136,9 +142,9 @@ class Shellista(cmd.Cmd):
   def getPrompt(self):
     prompt = os.path.relpath(os.getcwd(),os.path.expanduser('~'))
     if prompt == '.':
-      self.prompt = '</>:'
+      self.prompt = '/ >'
     else:
-      self.prompt = '<'+prompt + '>:'
+      self.prompt = prompt + ' >'
 
   def emptyline(self):
       pass

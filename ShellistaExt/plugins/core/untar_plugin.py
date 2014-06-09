@@ -3,7 +3,7 @@ untars an archive
 usage: untar file [destination]
 '''
 
-from tools.tools import bash
+from .. tools.toolbox import bash
 import os,tarfile,shutil
 
 def main(line):

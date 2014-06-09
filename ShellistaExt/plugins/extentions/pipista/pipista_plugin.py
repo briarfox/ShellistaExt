@@ -2,7 +2,7 @@
 Pipista added to Shellista!
 usage: pypi [download|search|version] module_name
 '''
-from tools.tools import bash
+from ... tools.toolbox import bash
 
 
 import os, os.path, sys, urllib2, requests, xmlrpclib

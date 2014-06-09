@@ -2,7 +2,7 @@
 Makes a directory
 usage: mkdir directory_name
 '''
-from tools.tools import bash
+from .. tools.toolbox import bash
 import os
 
 def main(line):

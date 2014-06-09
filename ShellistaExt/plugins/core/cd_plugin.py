@@ -1,6 +1,6 @@
 """change the current directory to DIR"""
 
-from tools.tools import bash
+from .. tools.toolbox import bash
 import os
 
 def main(line):

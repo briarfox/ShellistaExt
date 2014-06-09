@@ -4,7 +4,7 @@ usage: cp src [...] dest
 
 '''
 alias=['copy']
-from tools.tools import bash
+from .. tools.toolbox import bash
 import os,shutil
 
 def main(line):

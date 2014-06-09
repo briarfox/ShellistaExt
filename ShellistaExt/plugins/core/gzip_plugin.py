@@ -1,7 +1,7 @@
 '''gzip:
 tar and gzip a file/directory
 '''
-from tools.tools import bash,pprint
+from .. tools.toolbox import bash,pprint
 import tarfile,os,io
 
 

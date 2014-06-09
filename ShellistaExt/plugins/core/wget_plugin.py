@@ -1,7 +1,7 @@
 '''wget: downloads a file from a url'''
 
 import urllib2,os,sys
-from tools.tools import bash
+from .. tools.toolbox import bash
 
 alias = ['get',]
 

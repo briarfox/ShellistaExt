@@ -2,7 +2,7 @@
 Move files and directories
 usage: mv file_in_current_dir path_reletive_to_current_dir
 '''
-from tools.tools import bash,pprint
+from .. tools.toolbox import bash,pprint
 import os
 
 def main(line):

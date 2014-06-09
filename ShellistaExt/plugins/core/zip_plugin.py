@@ -2,7 +2,7 @@
 zips a directory
 usage: zip some/directory
 '''
-from tools.tools import bash,pprint
+from .. tools.toolbox import bash,pprint
 import zipfile,os
 
 def main(line):

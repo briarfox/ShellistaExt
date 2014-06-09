@@ -2,7 +2,7 @@
 unzip a gzip archive
 usage: ungzip file [destination]
 '''
-from tools.tools import bash,pprint
+from .. tools.toolbox import bash,pprint
 
 import os,shutil, zipfile, tarfile, gzip,glob
 

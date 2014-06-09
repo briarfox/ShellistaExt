@@ -1,7 +1,8 @@
 '''cat:
 Prints a file
 '''
-from tools.tools import bash
+#__package__ = 'ShellistaExt.plugins.core'
+from .. tools.toolbox import bash
 import os
 
 
