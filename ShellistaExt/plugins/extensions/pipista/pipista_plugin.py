@@ -13,18 +13,30 @@ def main(line):
   args = bash(line)
   print args
   if len(args) == 0:
-    print 'usage: [download|search|version] package'
+    print '''usage: 
+      pipista download package [version_number]
+      pipista search package
+      pipista version package
+      '''
     return
   if args[0] == 'download':
     print 'Pypi Downloading'
-    pypi_download(args[1])
+    if len(args) == 3:
+      pypi_download(args[1],args[2])
+    else:
+      pypi_download(args[1])
   elif args[0] == 'search':
-    print 'Pypi Searching'
+    print 'Pypi Searching ' + args[1]
     results =  pypi_search(args[1])
     for result in results:
       print 'Name: ' + result['name']
       print 'Summary: ' + result['summary']
       print 'Version: ' + result['version']
+  elif args[0] == 'version':
+    print 'Pypi versions for '+args[1]
+    results = pypi_versions(args[1])
+    print results
+    
   else:
     'Something Broke.'
     
