@@ -52,7 +52,6 @@ class Shellista(cmd.Cmd):
       
       
         if extension == '.py' and path != '__init__' and '_plugin' in path:
-          print file
           try:
             
             lib = importlib.import_module(root[2:].replace('/','.')+'.'+path)
@@ -142,9 +141,9 @@ class Shellista(cmd.Cmd):
   def getPrompt(self):
     prompt = os.path.relpath(os.getcwd(),os.path.expanduser('~'))
     if prompt == '.':
-      self.prompt = '/ >'
+      self.prompt = '/ >>'
     else:
-      self.prompt = prompt + ' >'
+      self.prompt = '/'+prompt + ' >>'
 
   def emptyline(self):
       pass
