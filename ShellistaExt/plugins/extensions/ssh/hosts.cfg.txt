@@ -1,0 +1,10 @@
+[rdr]
+host = rdrlotto.dyndns.org
+user = chris
+password = bassfish56
+
+[rdr1]
+host = rdrlotto.dyndns.org
+user = chris
+password = 
+
