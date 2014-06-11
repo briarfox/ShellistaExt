@@ -5,20 +5,22 @@ import paramiko
 import cmd,sys,getpass,os
 from ConfigParser import SafeConfigParser
 
-class RunCommand(cmd.Cmd):
+package_directory = os.path.dirname(os.path.abspath(__file__))
+
+class SSH:
     """ Simple shell to run a command on the host """
 
     prompt = 'ssh> '
 
     def __init__(self):
-        cmd.Cmd.__init__(self)
+       # cmd.Cmd.__init__(self)
         self.config = SafeConfigParser()
-        self.config.read('hosts.cfg.txt')
+        self.config.read(os.path.join(package_directory,'hosts.ini'))
         self.host = []
         self.cwd = ''
 
 
-    def do_addhost(self, line):
+    def addhost(self, line):
         """add_host 
         Add the host to the host list"""
         args = line.split()
@@ -33,35 +35,40 @@ class RunCommand(cmd.Cmd):
             self.config.set(args[0],'password',args[3])
         else:
             self.config.set(args[0],'password','')
-        with open('hosts.cfg.txt', 'w') as fp:
+        with open('hosts.ini', 'w') as fp:
             self.config.write(fp)
 
 
-    def do_connect(self, list):
+    def connect(self, list):
         """Connect to all hosts in the hosts list"""
+        
         args = list.split()
+
         
-        for section in self.config.sections():
-            print section
-            if section == args[0]:
-                self.host = [self.config.get(section,'host'),self.config.get(section,'user')]
-                if self.config.get(section,'password') == '':
-                    passwd = getpass.getpass('Password: ')
-                    self.host.append(passwd)
-                else:
-                    self.host.append(self.config.get(section,'password'))
+        if len(args) == 1:
+            for section in self.config.sections():
+                if section == args[0]:
+                    self.host = [self.config.get(section,'host'),self.config.get(section,'user')]
+                    if self.config.get(section,'password') == '':
+                        passwd = getpass.getpass('Password: ')
+                        self.host.append(passwd)
+                    else:
+                        self.host.append(self.config.get(section,'password'))
+        else:
+            self.host = [args[0],args[1],args[2]]
         
-        
-        
-        self.client = paramiko.SSHClient()
-        self.client.set_missing_host_key_policy(
-                paramiko.AutoAddPolicy())
-        self.client.connect(self.host[0], 
-                username=self.host[1], 
-                password=self.host[2])
-        _,err = self.runCommand('ls')
-        self.sign = '&' if err else ';'
-        self.do_cmd('')
+        try:
+            self.client = paramiko.SSHClient()
+            self.client.set_missing_host_key_policy(
+                    paramiko.AutoAddPolicy())
+            self.client.connect(self.host[0], 
+                    username=self.host[1], 
+                    password=self.host[2])
+            _,err = self.runCommand('ls')
+            self.sign = '&' if err else ';'
+            self.console()
+        except Exception,e:
+            print 'Error connecting to server %s' % self.host[0]
         
         
     def runCommand(self,command):
@@ -89,15 +96,20 @@ class RunCommand(cmd.Cmd):
         print self.cwd
         
 
-    def do_cmd(self,line):
+    def console(self):
         """run 
         Execute this command on all hosts in the list"""
         
         while True:
             command = raw_input('command>')
             args = command.split()
+            print args
             if args[0] == 'quit':
+                print 'leaving console'
+                self.client.close()
                 break
+                print 'didnt break'
+                
             if args[0]=='cd':
                 self.setPath(args[1])
             else:
@@ -107,16 +119,15 @@ class RunCommand(cmd.Cmd):
                 print str
                 if err: print err
         self.client.close()
-        return True
+        
                 
                 
-                
-            
-
-    def do_close(self, args):
-        sys.exit(0)
+        
           
 
 if __name__ == '__main__':
-    RunCommand().cmdloop()
+    ssh = SSH()
+    #ssh.connect()
+    
+    #ssh.console()
 
