@@ -21,26 +21,48 @@ class SSH:
 
 
     def addhost(self, line):
-        """add_host 
-        Add the host to the host list"""
+        """Usage:
+        addhost save_as host user [password] 
+        """
         args = line.split()
         #check that there is a correct number of args
         if len(args) < 3 or len(args)>4:
+            print self.addhost.__doc__
             return
-        
-        self.config.add_section(args[0])
+        if not self.config.has_section(args[0]):
+            self.config.add_section(args[0])
         self.config.set(args[0],'host',args[1])
         self.config.set(args[0],'user',args[2])
         if len(args) == 4:
             self.config.set(args[0],'password',args[3])
         else:
             self.config.set(args[0],'password','')
-        with open('hosts.ini', 'w') as fp:
+        self.saveConfig()
+            
+    def saveConfig(self):
+        with open(os.path.join(package_directory,'hosts.ini'), 'w') as fp:
             self.config.write(fp)
-
+            
+            
+    def listhost(self):
+        print 'Hosts saved in config:'
+        for section in self.config.sections():
+            print '>'+section
+            print '\thost: '+self.config.get(section,'host')
+            print '\tuser: '+self.config.get(section,'user')
+            
+    def delhost(self,line):
+        if self.config.has_section(line):
+            self.config.remove_section(line)
+            self.saveConfig()
+            print line + ' has been deleted.'
+        
 
     def connect(self, list):
-        """Connect to all hosts in the hosts list"""
+        """usage:
+    connect save_name
+    connect host user password    
+        """
         
         args = list.split()
 
@@ -55,7 +77,12 @@ class SSH:
                     else:
                         self.host.append(self.config.get(section,'password'))
         else:
-            self.host = [args[0],args[1],args[2]]
+            if len(args) == 3:
+                self.host = [args[0],args[1],args[2]]
+            else:
+                print 'invalid input'
+                print self.connect.__doc__
+                return
         
         try:
             self.client = paramiko.SSHClient()
@@ -93,7 +120,7 @@ class SSH:
             self.cwd = path
         else:
             self.cwd = os.path.join(self.cwd, path)
-        print self.cwd
+        print 'Directory: ' + self.cwd
         
 
     def console(self):
@@ -101,14 +128,13 @@ class SSH:
         Execute this command on all hosts in the list"""
         
         while True:
-            command = raw_input('command>')
+            command = raw_input('<ssh >')
             args = command.split()
-            print args
-            if args[0] == 'quit':
-                print 'leaving console'
+            if args[0] in ['quit','close','logout','logoff']:
+                
                 self.client.close()
                 break
-                print 'didnt break'
+                
                 
             if args[0]=='cd':
                 self.setPath(args[1])
@@ -127,7 +153,8 @@ class SSH:
 
 if __name__ == '__main__':
     ssh = SSH()
-    #ssh.connect()
+    #ssh.delhost('rdr')
+    ssh.listhost()
+    ssh.connect('server user pass')
     
-    #ssh.console()
 
