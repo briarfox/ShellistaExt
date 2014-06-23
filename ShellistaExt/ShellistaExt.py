@@ -36,7 +36,141 @@ import importlib
 # This has advantages over shlex, glob, and shlex->glob in that it expects
 # the strings to represent files from the start.
 
+PLUGINS_URL='https://github.com/briarfox/ShellistaExt/archive/master.tar.gz#module_name=plugins&module_path=ShellistaExt-master/ShellistaExt/plugins&move_to=.'
 
+#Imports for ModuleInstaller
+import mimetypes
+import tarfile
+import zipfile
+import urllib2
+import contextlib
+import shutil
+import glob
+import urlparse
+
+class ModuleInstaller():
+  url = ''
+  mime_type = None
+  download_name = ''
+  module_path = ''
+  move_to = ''
+  working_dir = '.'
+  module_name = ''
+  install_root = ''
+
+  def __init__(self, url, working_dir='./.module_installer'):
+    '''Initialize ModuleInstaller.  Url should contain a fragment (#) with
+    :param url: URL of file to install
+    query parameters:
+    http(s)://url/file.tar.gz#module_name=modname&module_path=Some/Path&move_to=/
+    module_name = local name of the module
+    module_path = relative path, once the module has been extracted, to the module dir to "install".
+    move_to = path to extract the module to, relative to install_root
+    '''
+    mimetypes.init()
+
+    self.url = url
+    parsed_url = urlparse.urlparse(url)
+    qs = urlparse.parse_qs(parsed_url.fragment)
+
+    if not qs.get('module_name') or not qs.get('module_path') or not qs.get('move_to'):
+      raise Exception('ModuleInstaller: Missing query string parameters')
+
+    self.module_path = qs['module_path'][0]
+    self.move_to = qs['move_to'][0]
+    self.mime_type = mimetypes.guess_type(parsed_url.path)
+    self.working_dir = os.path.abspath(working_dir)
+    self.module_name = qs['module_name'][0]
+
+    ext = os.path.splitext(parsed_url.path)
+    ext = os.path.splitext(ext[0])[1] + ext[1] #In case it's a .tar.gz
+    
+    self.download_name = self.module_name + ext
+    self.install_root = os.getcwd()
+
+  def untgz(self, name, to='.'):
+    tfile = tarfile.open(name, 'r:gz')
+    tfile.extractall(to)
+
+  def unzip(self, name, to='.'):
+    zfile = zipfile.ZipFile(name)
+    zfile.extractall(to)
+
+  #From mark_harris' wget
+  def download(self, url, dst=None):
+    '''Download a file from url, optionally naming it locally'''
+    if not dst:
+      os.path.basename(url.split('?',1)[0])
+    try:
+      total=0
+      with contextlib.closing(urllib2.urlopen(url)) as c:
+        with open(dst,'wb') as f:
+          while True:
+            data=c.read(32*1024)
+            if data=='':
+              break
+            f.write(data)
+            total+=len(data)
+    except Exception as e:
+      print 'Download error: ', e
+
+  def _mkworkdir(self):
+    '''Create the working directory'''
+    if not os.path.exists(self.working_dir):
+      os.mkdir(self.working_dir)
+
+  def _rmworkdir(self):
+    '''Remove the working directory'''
+    if os.path.exists(self.working_dir):
+      shutil.rmtree(self.working_dir)
+
+  def _glob_expand_path(self, glob_path):
+    '''Return the first glob matched entry'''
+    glob_result = glob.glob(glob_path)
+    if len(glob_result) > 0:
+      return glob_result[0]
+
+  def _workpath(self, *args):
+    '''Helper to get a subfolder of working path'''
+    return os.path.join(self.working_dir, *args)
+
+  def module_install(self):
+    '''Module "installer" for pure Python modules.'''
+    
+    self._mkworkdir()
+    
+    self.download(self.url, self._workpath(self.download_name))
+    
+    extract_func =  {
+                      ('application/x-tar', 'gzip'): self.untgz,
+                      ('application/zip', None): self.unzip,
+                    }[self.mime_type]
+                    
+    extract_func(self._workpath(self.download_name), self._workpath())
+    
+    module_full_path = self._workpath(self.module_path)
+    
+    src = self._glob_expand_path(module_full_path)
+    move_to = self.move_to
+    
+    #Strip leading slash, if any
+    if move_to.startswith(os.pathsep):
+      move_to = move_to[1:]
+      
+    dst = os.path.join(self.install_root, self.move_to)
+    
+    #Move the source folder to the dest
+    os.rename(src, os.path.join(dst, os.path.basename(src)))
+    
+    self._rmworkdir() #Clean up
+
+#Download plugins
+def _check_for_plugins():
+ plugins_parent = os.path.join(os.path.dirname(__file__))
+ if not os.path.exists(os.path.join(plugins_parent, 'plugins')):
+  print 'Downloading plugins...'
+  installer = ModuleInstaller(PLUGINS_URL)
+  installer.module_install()
  
 class Shellista(cmd.Cmd):
   
@@ -153,7 +287,7 @@ class Shellista(cmd.Cmd):
         pass
   
   
-                 
+_check_for_plugins()
 shell = Shellista()
 shell.cmdloop()
 
