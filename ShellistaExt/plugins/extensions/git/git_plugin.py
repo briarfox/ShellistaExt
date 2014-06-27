@@ -40,10 +40,10 @@ for i in [FUNKY_URL, MIMER_URL, DULWICH_URL, GITTLE_URL]:
     print "Importing " + installer.module_name
     installer.try_import_or_install(overwrite_existing=True, progress_func=_progress)
 
-dulwich = globals().get('dulwich')
-if dulwich:
-    from dulwich.client import default_user_agent_string
-    from dulwich import porcelain
+#Dulwich imports can now be done, since we've downloaded the modules
+from dulwich.client import default_user_agent_string
+from dulwich import porcelain
+
 
 def main(line):
     do_git(line)

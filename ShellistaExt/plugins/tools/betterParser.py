@@ -1,4 +1,7 @@
 import os
+import sys
+import glob
+
 class BetterParser:
     def __init__(self):
         self.env_vars = {"$HOME": os.path.expanduser('~')}
