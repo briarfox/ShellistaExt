@@ -42,13 +42,16 @@ import importlib
 
 #PLUGINS_URL='https://github.com/transistor1/shellista/archive/master.tar.gz#module_name=plugins&module_path=shellista-master&move_to=./plugins'
 
-__DEBUG__ = True
+shell = None
+
+__DEBUG__ = False
 
 if __DEBUG__:
     base_url = 'file:///{0}/{1}/{2}'.format(os.path.dirname(os.getcwd()),'shellista-deps','{0}')
     PLUGINS_URL= base_url.format('ShellistaExt-master.tar.gz#module_name=plugins&module_path=ShellistaExt/ShellistaExt/plugins&move_to=.')
 else:
-    PLUGINS_URL='https://github.com/briarfox/ShellistaExt/archive/master.tar.gz#module_name=plugins&module_path=ShellistaExt-master/ShellistaExt/plugins&move_to=.'
+    #PLUGINS_URL='https://github.com/briarfox/ShellistaExt/archive/master.tar.gz#module_name=plugins&module_path=ShellistaExt-master/ShellistaExt/plugins&move_to=.'
+    PLUGINS_URL='https://github.com/transistor1/ShellistaExt/archive/dev-modular.zip#module_name=plugins&module_path=ShellistaExt-*/ShellistaExt/plugins&move_to=.'
 
 
 #Imports for ModuleInstaller
@@ -412,8 +415,9 @@ class Shellista(cmd.Cmd):
         pass
 
 if __name__ == '__main__':
-    _check_for_plugins()
-    shell = Shellista()
-    shell.cmdloop()
+    if not shell:
+        _check_for_plugins()
+        shell = Shellista()
+        shell.cmdloop()
     
 
