@@ -5,6 +5,7 @@ import contextlib
 
 from ...tools.toolbox import bash
 
+alias = ['shell']
 
 def main(line):
     do_python(line)
@@ -26,13 +27,14 @@ def do_python(line):
         else:
             # Run the program and pass any args.
             try:
-                tmpg = globals()
-                tmpl = locals()
                 sys.argv = args[:]
-                execfile(os.path.join(os.getcwd(), args[0]), tmpg, tmpl)
+                file_path = os.path.relpath(args[0])
+                namespace = dict(locals(), **globals())
+                namespace['__name__'] = '__main__'
+                namespace['__file__'] = os.path.abspath(file_path)
+                execfile(file_path, namespace, namespace)
             except:
                 print 'Error: {0}'.format(sys.exc_value)
-
 
 class PyShell(cmd.Cmd):
     def __init__(self):
