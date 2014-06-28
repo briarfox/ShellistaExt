@@ -109,14 +109,18 @@ def do_git(line):
     def git_add(args):
         if len(args) > 0:
             repo = _get_repo()
-            repo.stage(args)
+            args = [os.path.join(os.path.relpath('.', repo.path),x) for x in args]
+            #repo.stage(args)
+            porcelain.add(repo.repo, args)
         else:
             print command_help['add']
 
     def git_rm(args):
         if len(args) > 0:
             repo = _get_repo()
-            repo.rm(args)
+            args = [os.path.join(os.path.relpath('.', repo.path),x) for x in args]
+            #repo.rm(args)
+            porcelain.rm(repo.repo, args)
         else:
             print command_help['rm']
 
@@ -267,7 +271,7 @@ def do_git(line):
     command_help = {
     'init':  'git init <directory> - initialize a new Git repository'
     ,'add': 'git add <file1> .. [file2] .. - stage one or more files'
-    ,'rm': 'git rm <file1> .. [file2] .. - git rm one or more files'
+    ,'rm': 'git rm <file1> .. [file2] .. - unstage one or more files'
     ,'commit': 'git commit <message> <name> <email> - commit staged files'
     ,'clone': 'git clone <url> [path] - clone a remote repository'
     ,'modified': 'git modified - show what files have been modified'
