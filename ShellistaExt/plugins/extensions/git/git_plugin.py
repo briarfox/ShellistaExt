@@ -65,6 +65,24 @@ def do_git(line):
     git_user = None
     git_email = None
 
+    #Find a git repo dir
+    def _find_repo(path):
+        subdirs = os.walk(path).next()[1]
+        if '.git' in subdirs:
+            return path
+        else:
+            parent = os.path.dirname(path)
+            if parent == path:
+                return None
+            else:
+                return _find_repo(parent)
+
+
+    #Get the parent git repo, if there is one
+    def _get_repo():
+        return Gittle(_find_repo(os.getcwd()))
+
+
     def git_init(args):
         if len(args) == 1:
             Gittle.init(args[0])
@@ -73,21 +91,16 @@ def do_git(line):
 
     def git_status(args):
         if len(args) == 0:
-            repo = Gittle('.')
+            repo = _get_repo()
             status = porcelain.status(repo.repo)
             print status
-
-            #repo.diff_working()
-            #repo.diff(diff_type='changes')
-            #print repo.modified_files.intersection(repo.added_files) #repo.tracked_files.intersection(repo.added_files)
-            #print repo.added_files
         else:
             print command_help['git_staged']
 
     def git_remote(args):
         '''List remote repos'''
         if len(args) == 0:
-            repo = Gittle('.')
+            repo = _get_repo()
             for key, value in repo.remotes.items():
                 print key, value
         else:
@@ -95,21 +108,21 @@ def do_git(line):
 
     def git_add(args):
         if len(args) > 0:
-            repo = Gittle('.')
+            repo = _get_repo()
             repo.stage(args)
         else:
             print command_help['add']
 
     def git_rm(args):
         if len(args) > 0:
-            repo = Gittle('.')
+            repo = _get_repo()
             repo.rm(args)
         else:
             print command_help['rm']
 
     def git_branch(args):
         if len(args) == 0:
-            repo = Gittle('.')
+            repo = _get_repo()
             active = repo.active_branch
             for key, value in repo.branches.items():
                 print ('* ' if key == active else '') + key, value
@@ -118,7 +131,7 @@ def do_git(line):
 
     def git_reset(args):
         if len(args) == 0:
-            repo = Gittle('.')
+            repo = _get_repo()
             porcelain.reset(repo.repo, 'hard')
         else:
             print command_help['reset']
@@ -126,7 +139,7 @@ def do_git(line):
     def git_commit(args):
         if len(args) == 3:
             try:
-                repo = Gittle('.')
+                repo = _get_repo()
                 #print repo.commit(name=args[1],email=args[2],message=args[0])
                 author = "{0} <{1}>".format(args[1], args[2])
                 print porcelain.commit(repo.repo, args[0], author, author )
@@ -139,11 +152,7 @@ def do_git(line):
         if len(args) > 0:
             url = args[0]
 
-            #def clone(source, target=None, bare=False, checkout=None, config=None, opener=None, outstream=sys.stdout):
             repo = Gittle.clone(args[0], args[1] if len(args)>1 else '.', bare=False)
-
-            #porcelain.clone(url, target='.')
-            #repo = Gittle('.')
 
             #Set the origin
             config = repo.repo.get_config()
@@ -154,7 +163,7 @@ def do_git(line):
 
     def git_pull(args):
         if len(args) <= 1:
-            repo = Gittle('.')
+            repo = _get_repo()
             url = args[0] if len(args)==1 else repo.remotes.get('origin','')
             if url:
                 repo.pull(origin_uri=url)
@@ -176,7 +185,7 @@ def do_git(line):
 
         user, sep, pw = result.u.partition(':') if result.u else (None,None,None)
 
-        repo = Gittle('.')
+        repo = _get_repo()
 
         #Try to get the remote origin
         if not result.url:
@@ -197,22 +206,24 @@ def do_git(line):
             print porcelain.push(repo.repo, result.url, branch_name)
 
     def git_modified(args):
-        repo = Gittle('.')
+        repo = _get_repo()
         for mod_file in repo.modified_files:
             print mod_file
 
     def git_log(args):
         if len(args) <= 1:
             try:
-                porcelain.log(max_entries=int(args[0]) if len(args)==1 else None)
+                repo = _get_repo()
+                porcelain.log(repo.repo, max_entries=int(args[0]) if len(args)==1 else None)
             except ValueError:
                 print command_help['log']
         else:
             print command_help['log']
 
+
     def git_checkout(args):
         if len(args) in [1,2]:
-            repo = Gittle('.')
+            repo = _get_repo()
             if len(args) == 1:
                 repo.clean_working()
                 repo.switch_branch('{0}'.format(args[0]))
