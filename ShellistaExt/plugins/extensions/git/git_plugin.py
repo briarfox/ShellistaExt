@@ -196,7 +196,8 @@ def do_git(line):
 
         user, sep, pw = result.u.partition(':') if result.u else (None,None,None)
 
-        repo = _get_repo()
+        #repo = _get_repo()
+        repo = Gittle('.')
 
         #Try to get the remote origin
         if not result.url:
@@ -235,7 +236,7 @@ def do_git(line):
             opener = auth_urllib2_opener(None, result.url, user, pw)
 
             print porcelain.push(repo.repo, result.url, branch_name, opener=opener)
-            keychain.set_password(keychainservice,user,pw)
+            keychain.set_password(keychainservice, user, pw)
 
         else:
             print porcelain.push(repo.repo, result.url, branch_name)
