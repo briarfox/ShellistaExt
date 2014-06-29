@@ -8,7 +8,11 @@ def login_alert(title, message = None, login = None, password = None, ok_button_
     user = raw_input('Username ({0}):'.format(login))
     if login and not user:
         user = login
-    pw = getpass.getpass('Password: ')
+
+    if not user:
+        return (None, None)
+
+    pw = getpass.getpass('Password for {0}: '.format(user))
     return (user, pw)
 
 def clear():

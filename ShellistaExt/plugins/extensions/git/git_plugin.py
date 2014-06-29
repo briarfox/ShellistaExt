@@ -196,9 +196,8 @@ def do_git(line):
 
         user, sep, pw = result.u.partition(':') if result.u else (None,None,None)
 
-        #repo = _get_repo()
-        repo = Gittle('.')
-
+        repo = _get_repo()
+        
         #Try to get the remote origin
         if not result.url:
             result.url = repo.remotes.get('origin','')
