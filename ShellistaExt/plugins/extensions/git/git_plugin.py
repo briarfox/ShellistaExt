@@ -5,20 +5,32 @@ usage: git help
 import os
 import sys
 import argparse
-
+import urlparse
+import urllib2
+import getpass
 
 alias = []
 
 from ... tools.toolbox import bash
 
+#iOS-specific
+try:
+    import console
+except:
+    from ... tools import ios_console as console
+
+from ... tools import ios_keychain as keychain
+
+
 shellista = sys.modules['__main__']
+
+SAVE_PASSWORDS = shellista.Shellista.settings.get('save_passwords', True)
 
 __DEBUG__ = False
 
 if __DEBUG__:
 
     base_url = 'file://' + os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))) + '/shellista-deps'
-    PIPISTA_URL= base_url + '/pipista.py#module_name=pipista&module_path=pipista.py&move_to=./local-modules'
     DULWICH_URL = base_url + '/dulwich.tar.gz#module_name=dulwich&module_path=dulwich-master/dulwich&move_to=./local-modules'
     GITTLE_URL = base_url + '/gittle.tar.gz#module_name=gittle&module_path=gittle-*/gittle&move_to=./local-modules'
     FUNKY_URL = base_url + '/funky.tar.gz#module_name=funky&module_path=*funky-*/funky&move_to=./local-modules'
@@ -43,6 +55,7 @@ for i in [FUNKY_URL, MIMER_URL, DULWICH_URL, GITTLE_URL]:
 #Dulwich imports can now be done, since we've downloaded the modules
 from dulwich.client import default_user_agent_string
 from dulwich import porcelain
+from gittle import Gittle
 
 
 def main(line):
@@ -52,18 +65,13 @@ def main(line):
 
 def do_git(line):
     """Very basic Git commands: init, stage, commit, clone, modified, branch"""
-    from gittle import Gittle
-
     #TODO: Clean up this code
     #TODO: git functions should probably all use parseargs, like git push
     #TODO: These git functions all follow the same pattern.
     #               Refactor these so they only contain their unique logic
     #TODO: Add jsbain's keychain addition. Need to figure out how to
     #               Add ipad-specific modules without breaking Shellista everywhere
-    #TODO: If there is no ~/.gitconfig file, set up the username and password
-
-    git_user = None
-    git_email = None
+    #TODO: If there is no ~/.gitconfig file, set up the username and passworde
 
     #Find a git repo dir
     def _find_repo(path):
@@ -179,7 +187,6 @@ def do_git(line):
 
 
     def git_push(args):
-        import argparse
         parser = argparse.ArgumentParser(prog='git push'
                                          , usage='git push [http(s)://<remote repo>] [-u username[:password]]'
                                          , description="Push to a remote repository")
@@ -199,13 +206,37 @@ def do_git(line):
 
         print "Attempting to push to: {0}, branch: {1}".format(result.url, branch_name)
 
+        netloc = urlparse.urlparse(result.url).netloc
+
+        keychainservice = 'shellista.git.{0}'.format(netloc)
+
+        if sep and not user:
+            # -u : clears keychain for this server
+            for service in keychain.get_services():
+                if service[0]==keychainservice:
+                    keychain.delete_password(*service)
+
+        #Attempt to retrieve user
+        if not user and SAVE_PASSWORDS:
+            try:
+                user = dict(keychain.get_services())[keychainservice]
+            except KeyError:
+                user, pw = console.login_alert('Enter credentials for {0}'.format(netloc))
+
         if user:
+            if not pw and SAVE_PASSWORDS:
+                pw = keychain.get_password(keychainservice, user)
+
+            #Check again, did we retrieve a password?
             if not pw:
-                pw = getpass.getpass('Enter password for {0}: '.format(user))
+                user, pw = console.login_alert('Enter credentials for {0}'.format(netloc), login=user)
+                #pw = getpass.getpass('Enter password for {0}: '.format(user))
 
             opener = auth_urllib2_opener(None, result.url, user, pw)
 
             print porcelain.push(repo.repo, result.url, branch_name, opener=opener)
+            keychain.set_password(keychainservice,user,pw)
+
         else:
             print porcelain.push(repo.repo, result.url, branch_name)
 
