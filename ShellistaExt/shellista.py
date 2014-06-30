@@ -385,14 +385,14 @@ class Shellista(cmd.Cmd):
     def precmd(self, line):
         plugins = self.PRECMD_PLUGINS
         for plugin in plugins:
-            line = plugin(line)
+            line = plugin(self, line)
         line = cmd.Cmd.precmd(self, line)
         return line
         
     def postcmd(self, stop, line):
         plugins = self.POSTCMD_PLUGINS
         for plugin in plugins:
-            plugin(stop, line)
+            plugin(self, stop, line)
         return self.did_quit
 
     def addCmdList(self,name):
