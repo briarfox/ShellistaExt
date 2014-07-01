@@ -5,7 +5,7 @@ usage: mkdir directory_name
 from .. tools.toolbox import bash
 import os
 
-def main(line):
+def main(self, line):
     """make a directory"""
     args = bash(line)
     if args is None:

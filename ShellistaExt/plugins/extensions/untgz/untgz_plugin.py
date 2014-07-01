@@ -3,7 +3,7 @@ import tarfile
 
 from ... tools.toolbox import bash
 
-def main(line):
+def main(self, line):
     do_untgz(line)
 
 shellista = sys.modules['__main__']

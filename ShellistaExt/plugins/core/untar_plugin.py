@@ -6,7 +6,7 @@ usage: untar file [destination]
 from .. tools.toolbox import bash
 import os,tarfile,shutil
 
-def main(line):
+def main(self, line):
     """untar a tar archive"""
     # filename with optional destination
     args = bash(line)

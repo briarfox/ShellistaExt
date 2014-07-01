@@ -7,7 +7,7 @@ from ...tools.toolbox import bash
 
 alias = ['shell']
 
-def main(line):
+def main(self, line):
     do_python(line)
 
 

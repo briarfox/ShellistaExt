@@ -12,7 +12,7 @@ except:
 
 from ... tools.toolbox import bash
 
-def main(line):
+def main(self, line):
     print line
     args = bash(line)
 

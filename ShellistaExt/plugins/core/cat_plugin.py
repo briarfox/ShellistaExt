@@ -6,7 +6,7 @@ from .. tools.toolbox import bash
 import os
 
 
-def main(line):
+def main(self, line):
     """print file"""
     args = bash(line)
     if args is None:

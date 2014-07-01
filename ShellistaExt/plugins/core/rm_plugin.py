@@ -7,7 +7,7 @@ import os,shutil
 
 alias = ['remove']
 
-def main(line):
+def main(self, line):
     """remove one or more files/directories"""
     args = bash(line)
     if args is None:

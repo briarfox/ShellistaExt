@@ -9,7 +9,7 @@ import os, os.path, sys, urllib2, requests, xmlrpclib
 
 alias = ['pypi']
 
-def main(line):
+def main(self, line):
   args = bash(line)
   print args
   if len(args) == 0:

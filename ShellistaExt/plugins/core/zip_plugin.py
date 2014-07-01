@@ -5,7 +5,7 @@ usage: zip some/directory
 from .. tools.toolbox import bash,pprint
 import zipfile,os
 
-def main(line):
+def main(self, line):
     args = bash(line)
     path = os.getcwd() +'/'+ args[0]
     name = args[0]+'.zip'

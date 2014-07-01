@@ -58,7 +58,7 @@ from dulwich import porcelain
 from gittle import Gittle
 
 
-def main(line):
+def main(self, line):
     do_git(line)
     
 #TODO: This might be better as a class, play around with it

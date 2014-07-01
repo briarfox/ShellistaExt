@@ -4,7 +4,7 @@ from .. tools.toolbox import bash,pprint
 
 import os
 
-def main(line):
+def main(self, line):
     """list directory contents"""
     files = bash(line)
     if files is None:

@@ -1,7 +1,7 @@
 
 from ...tools.toolbox import bash
 
-def main(line):
+def main(self, line):
     do_touch(line)
 
 def do_touch(line):
