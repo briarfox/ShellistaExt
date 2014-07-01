@@ -10,7 +10,7 @@ from ssh import SSH
 
 alias = []
 
-def main(line):
+def main(self, line):
     args = line.split()
     ssh = SSH()
     if len(args) == 0:

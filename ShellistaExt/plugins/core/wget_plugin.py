@@ -5,7 +5,7 @@ from .. tools.toolbox import bash
 
 alias = ['get',]
 
-def main(line):
+def main(self, line):
   '''Gets a file from a link.'''
   args = bash(line)
   if args == None:

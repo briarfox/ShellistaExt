@@ -7,7 +7,7 @@ alias=['copy']
 from .. tools.toolbox import bash
 import os,shutil
 
-def main(line):
+def main(self, line):
     """copy files and directories"""
     args = bash(line)
     if args is None:

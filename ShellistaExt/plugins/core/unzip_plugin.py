@@ -6,7 +6,7 @@ usage: unzip file [destination]
 from .. tools.toolbox import bash,pprint
 import zipfile,os
 
-def main(line):
+def main(self, line):
     """unzip a zip archive"""
     # filename with optional destination
     args = bash(line)

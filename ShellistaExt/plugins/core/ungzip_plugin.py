@@ -7,7 +7,7 @@ from .. tools.toolbox import bash,pprint
 import os,shutil, zipfile, tarfile, gzip,glob
 
 alias = ['gunzip']
-def main(line):
+def main(self, line):
   """ungzip a gzip archive"""
         # filename with optional output filename
   fname = 'ungzip'

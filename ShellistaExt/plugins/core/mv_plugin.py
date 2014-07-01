@@ -5,7 +5,7 @@ usage: mv file_in_current_dir path_reletive_to_current_dir
 from .. tools.toolbox import bash,pprint
 import os
 
-def main(line):
+def main(self, line):
   """move files and directories"""
   args = bash(line)
   if args is None:

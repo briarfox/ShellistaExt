@@ -16,7 +16,7 @@ def make_tarfile(source_dir):
     return bytes.getvalue()
 
 
-def main(line):
+def main(self, line):
   args = bash(line)
   if args == None:
     return
