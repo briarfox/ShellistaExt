@@ -184,15 +184,12 @@ class Shellista(cmd.Cmd):
             for file in files:
                 (path, extension) = os.path.splitext(file)
               
-              
                 if extension == '.py' and path != '__init__' and '_plugin' in path:
                     try:
-                      
                         lib = importlib.import_module(root[2:].replace('/','.')+'.'+path)
                         name = 'do_'+path.lower().replace('_plugin','')
                         if self.addCmdList(path.lower()):
                             setattr(Shellista, name, self._CmdGenerator(lib.main))
-                      
                         try:
                             for a in lib.alias:
                                 #pass
@@ -200,19 +197,14 @@ class Shellista(cmd.Cmd):
                                     parent = path.lower().replace('_plugin','')
                                     setattr(Shellista,'do_' + a.lower(),self._aliasGenerator(getattr(self,name)))
                                     setattr(Shellista,'help_'+a.lower(),self._HelpGenerator('Alias for: %s. Please use help on %s for usage.' % (parent,parent)))
-                                  
                         except (ImportError, AttributeError) as desc:
                             pass
-                            
-                              
-                              
                         if lib.__doc__:
                             setattr(Shellista, 'help_' + path.lower().replace('_plugin',''), self._HelpGenerator(lib.__doc__))
                     except (ImportError, AttributeError) as desc:
                         print('Exption error')
                         print(desc)
-             
-             
+
         cmd.Cmd.__init__(self)
         os.chdir(os.path.expanduser('~/Documents'))
         self.getPrompt()
@@ -231,25 +223,23 @@ class Shellista(cmd.Cmd):
             #args.extend(shlex.split(line))
             function(line)
             self.getPrompt()
-       
+
         return CmdProxy
      
     def _HelpGenerator(self, help):
         def HelpProxy(self):
             print(help)
-       
+
         return HelpProxy
         
     def _aliasGenerator(self,func):
-    
         def aliasProxy(self,line):
-          
             func(line)
+
         return aliasProxy
         
     def do_quit(self,line):
         self.did_quit = True
-
     def do_exit(self,line):
         self.did_quit = True
     def do_close(self,line):
@@ -269,13 +259,7 @@ class Shellista(cmd.Cmd):
         else:
             self.cmdList.append(name)
             return True
-          
-            
-            
-            
-            
-        
-          
+
     def getPrompt(self):
         prompt = os.path.relpath(os.getcwd(),os.path.expanduser('~'))
         if prompt == '.':
@@ -285,9 +269,7 @@ class Shellista(cmd.Cmd):
       
     def emptyline(self):
         pass
-  
-  
+
 _check_for_plugins()
 shell = Shellista()
 shell.cmdloop()
-
