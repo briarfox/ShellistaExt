@@ -1,6 +1,9 @@
 '''rm:
 remove one or more files/directories
-usage: rm file_or_dir [...]
+usage: rm [-r] file_or_dir [...]
+
+options:
+    -r    Flag to remove directories
 '''
 from .. tools.toolbox import bash,pprint
 import os,shutil
