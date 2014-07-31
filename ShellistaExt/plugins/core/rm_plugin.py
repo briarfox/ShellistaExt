@@ -10,6 +10,7 @@ alias = ['remove']
 def main(self, line):
     """remove one or more files/directories"""
     args = bash(line)
+    print args
     if args is None:
       return
     elif (len(args) < 1):
@@ -20,14 +21,14 @@ def main(self, line):
         if not os.path.exists(filef):
           print "! Skipping: Not found -", pprint(filef)
           continue
-        if (os.path.isdir(full_file)):
+        if (os.path.isdir(full_file)) and args[0]=='-r':
           try:
             shutil.rmtree(full_file, True)
             if (os.path.exists(full_file)):
               print "rm: %s: Unable to remove" % pprint(filef)
           except Exception:
             print "rm: %s: Unable to remove" % pprint(filef)
-        else:
+        elif args[0] != '.':
           try:
             os.remove(full_file)
           except Exception:

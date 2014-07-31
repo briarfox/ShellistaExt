@@ -221,7 +221,7 @@ class Shellista(cmd.Cmd):
         def CmdProxy(self, line):
             #args = [name]
             #args.extend(shlex.split(line))
-            function(line)
+            function(self,line)
             self.getPrompt()
 
         return CmdProxy
